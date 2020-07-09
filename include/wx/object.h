@@ -22,6 +22,8 @@
 #ifndef WXBUILDING
     #include "wx/string.h"
 #endif
+#include <atomic>
+#include "wx/memory.h"
 
 // based on the value of wxUSE_EXTENDED_RTTI symbol,
 // only one of the RTTI system will be compiled:
@@ -159,7 +161,7 @@ inline T *wxCheckCast(const void *ptr)
 class WXDLLIMPEXP_BASE wxRefCounter
 {
 public:
-    wxRefCounter() { m_count = 1; }
+    wxRefCounter() : m_count(1) { }
 
     int GetRefCount() const { return m_count; }
 
@@ -173,7 +175,7 @@ protected:
 
 private:
     // our refcount:
-    int m_count;
+    std::atomic_int m_count;
 
     // It doesn't make sense to copy the reference counted objects, a new ref
     // counter should be created for a new object instead and compilation
