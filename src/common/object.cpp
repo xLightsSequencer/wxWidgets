@@ -335,7 +335,7 @@ void wxRefCounter::DecRef()
 {
     wxASSERT_MSG( m_count > 0, "invalid ref data count" );
 
-    if ( --m_count == 0 )
+    if ( m_count.fetch_sub(1) == 1 )
         delete this;
 }
 
