@@ -284,6 +284,10 @@ void wxAuiGenericTabArt::DrawBackground(wxDC& dc,
     int topLightness = 90;
     int bottomLightness = 170;
 
+    if (wxSystemSettings::GetAppearance().IsUsingDarkBackground()) {
+        bottomLightness = 110;
+    }
+
     wxColor top_color    = m_baseColour.ChangeLightness(topLightness);
     wxColor bottom_color = m_baseColour.ChangeLightness(bottomLightness);
     wxRect r;
