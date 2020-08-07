@@ -67,14 +67,13 @@ void wxGridSelection::EndSelecting()
     //send the RANGE_SELECTED events
     if (IsSelection())
     {
-        size_t n;
         wxRect r;
         wxGridCellCoords coords1, coords2;
 
-        // deselect all blocks and update the screen
-        while ( ( n = m_selection.size() ) > 0)
+        // Send selection events for all the selected blocks.
+        const size_t count = m_selection.size();
+        for ( size_t n = 0; n < count; n++ )
         {
-            n--;
             const wxGridBlockCoords& block = m_selection[n];
             coords1 = block.GetTopLeft();
             coords2 = block.GetBottomRight();
