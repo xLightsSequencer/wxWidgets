@@ -83,7 +83,7 @@ bool wxCheckListBox::IsChecked(unsigned int n) const
     wxCHECK_MSG( IsValid(n), false,
                  wxT("invalid index in wxCheckListBox::IsChecked") );
 
-    return m_checks[n] != 0;
+    return n < m_checks.size() && m_checks[n] != 0;
 }
 
 void wxCheckListBox::Check(unsigned int n, bool check)
