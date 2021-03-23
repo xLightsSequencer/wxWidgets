@@ -2818,8 +2818,7 @@ wxGenericTreeCtrl::PaintLevel(wxGenericTreeItem *item,
         {
             // if the background colour is white, choose a
             // contrasting color for the lines
-            dc.SetPen(*((GetBackgroundColour() == *wxWHITE)
-                         ? wxMEDIUM_GREY_PEN : wxWHITE_PEN));
+            dc.SetPen(wxPen(wxSystemSettings::GetColour(wxSYS_COLOUR_GRAYTEXT)));
             dc.DrawLine(0, y_top, 10000, y_top);
             dc.DrawLine(0, y, 10000, y);
         }
@@ -2871,7 +2870,7 @@ wxGenericTreeCtrl::PaintLevel(wxGenericTreeItem *item,
                     flag |= wxCONTROL_EXPANDED;
                 if (item == m_underMouse)
                     flag |= wxCONTROL_CURRENT;
-
+                
                 wxRendererNative::Get().DrawTreeItemButton
                                         (
                                             this,
