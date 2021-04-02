@@ -316,7 +316,7 @@
 //
 // Recommended setting: 0, use wxString::ToStdWstring() and ToStdString() or,
 // preferably, utf8_string() explicitly instead.
-#define wxUSE_STD_STRING_CONV_IN_WXSTRING 0
+#define wxUSE_STD_STRING_CONV_IN_WXSTRING 1
 
 // ----------------------------------------------------------------------------
 // non GUI features selection
