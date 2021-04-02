@@ -132,8 +132,15 @@ bool wxButton::Create(wxWindow *parent,
     if ( useLabel )
         SetLabel(label);
 
-    if (style & wxNO_BORDER)
+    if (style & wxNO_BORDER) {
        gtk_button_set_relief( GTK_BUTTON(m_widget), GTK_RELIEF_NONE );
+       GtkStyle *style = gtk_widget_get_style(GTK_WIDGET(m_widget));
+       //style->bg[GTK_STATE_PRELIGHT] = style->bg[GTK_STATE_NORMAL];
+       style->xthickness=-4;
+       style->ythickness=-4;
+       gtk_container_set_border_width(GTK_CONTAINER(m_widget),0);
+       gtk_widget_set_style(GTK_WIDGET(m_widget), style);
+    }
 
     if (style & wxBU_EXACTFIT)
     {
