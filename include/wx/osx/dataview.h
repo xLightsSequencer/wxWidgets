@@ -286,6 +286,7 @@ protected:
   void OnSize(wxSizeEvent &event);
   void OnMouse(wxMouseEvent &event);
 
+  virtual void DoThaw() wxOVERRIDE;
 private:
  // initializing of local variables:
   void Init();
