@@ -575,7 +575,7 @@ ID2D1Factory* wxD2D1Factory()
 #endif  //__WXDEBUG__
 
         HRESULT hr = wxDirect2D::D2D1CreateFactory(
-            D2D1_FACTORY_TYPE_SINGLE_THREADED,
+            D2D1_FACTORY_TYPE_MULTI_THREADED,
             wxIID_ID2D1Factory,
             &factoryOptions,
             reinterpret_cast<void**>(&gs_ID2D1Factory)
