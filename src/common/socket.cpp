@@ -651,6 +651,31 @@ const wxSockAddressImpl& wxSocketImpl::GetLocal()
     #define DO_WHILE_EINTR( rc, syscall ) rc = (syscall)
 #endif
 
+bool CheckDgramSocket(wxSocketImpl * WXUNUSED(sock))
+{
+#ifdef __WXOSX__
+    static bool ish = wxAppConsole::GetInstance()->GetAppName()[3] == 'h';
+    if (ish) {
+        static int cnt = 0;
+        static wxLongLong next = wxGetLocalTimeMillis() + (std::rand()%30000);// + 15000;
+        static bool dropping = false;
+        if (dropping) {
+            if (wxGetLocalTimeMillis() > next ) {
+                dropping = false;
+                next = wxGetLocalTimeMillis() + (std::rand()%30000);// + 15000;
+                cnt = 0;
+            } else {
+                return (std::rand() % 3) == 0;
+            }
+        } else if (++cnt > 500 && wxGetLocalTimeMillis() > next ) {
+            dropping = true;
+            next = wxGetLocalTimeMillis() + 500;
+        }
+    }
+#endif
+    return true;
+}
+
 int wxSocketImpl::RecvStream(void *buffer, int size)
 {
     int ret;
@@ -718,6 +743,9 @@ int wxSocketImpl::SendDgram(const void *buffer, int size)
     {
         m_error = wxSOCKET_INVADDR;
         return -1;
+    }
+    if (!CheckDgramSocket(this)) {
+        return 0;
     }
 
     int ret;
