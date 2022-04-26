@@ -956,7 +956,8 @@ bool wxNonOwnedWindowCocoaImpl::Show(bool show)
                 {
                     NSWindow* parentNSWindow = [parentView window];
                     if ( parentNSWindow ) {
-                        [parentNSWindow addChildWindow:m_macWindow ordered:NSWindowAbove];
+                        //[parentNSWindow addChildWindow:m_macWindow ordered:NSWindowAbove];
+                        
                         // If the parent is modal, windows with wxFRAME_FLOAT_ON_PARENT style need
                         // to be in NSModalPanelWindowLevel and not NSFloatingWindowLevel to stay
                         // above the parent.
