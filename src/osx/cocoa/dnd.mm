@@ -502,21 +502,28 @@ wxDragResult wxDropSource::DoDragDrop(int flags)
         DropSourceDelegate* delegate = [[DropSourceDelegate alloc] init];
         [delegate setImplementation:this flags:flags];
 
-        // add a dummy square as dragged image for the moment,
         // TODO: proper drag image for data
-        NSSize sz = NSMakeSize(16,16);
-        NSRect fillRect = NSMakeRect(0, 0, 16, 16);
-        NSImage* image = [[NSImage alloc] initWithSize: sz];
+        wxCursor c = GetCursor(wxDragCopy);
+        NSImage* image = nil;
+        if (c.IsOk()) {
+            NSCursor *cursor = (NSCursor*)c.GetHCURSOR();
+            image = [[cursor image] retain];
+        }
+        if (image == nil) {
+            // add a dummy square as dragged image for the moment,
+            NSSize sz = NSMakeSize(16,16);
+            NSRect fillRect = NSMakeRect(0, 0, 16, 16);
+            NSImage* image = [[NSImage alloc] initWithSize: sz];
 
-        [image lockFocus];
+            [image lockFocus];
 
-        [[[NSColor whiteColor] colorWithAlphaComponent:0.8] set];
-        NSRectFill(fillRect);
-        [[NSColor blackColor] set];
-        NSFrameRectWithWidthUsingOperation(fillRect,1.0f,NSCompositeDestinationOver);
+            [[[NSColor whiteColor] colorWithAlphaComponent:0.8] set];
+            NSRectFill(fillRect);
+            [[NSColor blackColor] set];
+            NSFrameRectWithWidthUsingOperation(fillRect,1.0f,NSCompositeDestinationOver);
 
-        [image unlockFocus];
-
+            [image unlockFocus];
+        }
         NSPoint down = [theEvent locationInWindow];
         NSPoint p = [view convertPoint:down fromView:nil];
 
