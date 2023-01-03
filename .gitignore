@@ -89,6 +89,7 @@
 /build/osx/build
 /build/osx/setup/cocoa/include/wx/setup.h
 /build/osx/setup/iphone/include/wx/setup.h
+/build/*.o
 
 # /demos/
 /demos/*/*.sln
