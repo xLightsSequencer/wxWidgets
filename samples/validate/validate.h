@@ -12,6 +12,7 @@
 #include "wx/combobox.h"
 #include "wx/dialog.h"
 #include "wx/frame.h"
+#include "wx/hashset.h"
 #include "wx/listbox.h"
 #include "wx/string.h"
 
@@ -31,6 +32,7 @@ public:
     void OnQuit(wxCommandEvent& event);
     void OnTestDialog(wxCommandEvent& event);
     void OnToggleBell(wxCommandEvent& event);
+    void OnValidationMode(wxCommandEvent& event);
 
 private:
     wxListBox *m_listbox;
@@ -38,6 +40,8 @@ private:
 
     wxDECLARE_EVENT_TABLE();
 };
+
+WX_DECLARE_HASH_SET(wxWindow*, wxPointerHash, wxPointerEqual, InvalidWindowsSet);
 
 class MyDialog : public wxDialog
 {
@@ -48,12 +52,16 @@ public:
             const long style = wxDEFAULT_DIALOG_STYLE);
 
     void OnChangeValidator(wxCommandEvent& event);
+    void OnValidate(wxValidationStatusEvent& event);
+    void OnUpdateUI(wxUpdateUIEvent& event);
 
     wxTextCtrl *m_text;
     wxComboBox *m_combobox;
 
     wxTextCtrl *m_numericTextInt;
     wxTextCtrl *m_numericTextDouble;
+
+    InvalidWindowsSet m_invalidWins;
 };
 
 // ----------------------------------------------------------------------------
@@ -118,12 +126,15 @@ private:
         Id_IncludeCharListTxt,
         Id_ExcludeListTxt,
         Id_ExcludeCharListTxt,
+        Id_RegexTxt,
     };
 
     wxTextCtrl* const m_txtCtrl;
 
     bool m_noValidation;
     long m_validatorStyle;
+
+    wxString        m_regexStr;
 
     wxString        m_charIncludes;
     wxString        m_charExcludes;
@@ -159,7 +170,7 @@ public:
     int m_radiobox_choice;
 };
 
-class MyComboBoxValidator : public wxValidator
+class MyComboBoxValidator : public wxTextEntryValidator
 {
 public:
     MyComboBoxValidator(wxString* var) { m_var=var; }
@@ -173,6 +184,9 @@ public:
     // Called to transfer data from the window
     virtual bool TransferFromWindow() override;
 
+    // Override base class method
+    virtual wxString IsValid(const wxString& str) const override;
+
 protected:
     wxString* m_var;
 };
@@ -183,6 +197,10 @@ enum
 
     VALIDATE_TEST_DIALOG,
     VALIDATE_TOGGLE_BELL,
+
+    VALIDATE_MODE_DEFAULT,
+    VALIDATE_MODE_INTERACTIVE,
+    VALIDATE_MODE_ON_FOCUS_LOST,
 
     VALIDATE_TEXT,
     VALIDATE_TEXT2,
