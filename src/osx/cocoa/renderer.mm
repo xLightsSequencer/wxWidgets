@@ -786,13 +786,14 @@ void wxRendererMac::DrawMacHeaderCell(wxWindow *win,
                 default:
                     cell.alignment = NSTextAlignmentLeft;
             }
-
         }
         else
         {
             cell.title = @("");
             cell.alignment = NSTextAlignmentLeft;
         }
+
+        cell.state = NSControlStateValueMixed;
 
         wxGCDCImpl *impl = (wxGCDCImpl*) dc.GetImpl();
         CGContextRef cgContext = (CGContextRef) impl->GetGraphicsContext()->GetNativeContext();
