@@ -736,6 +736,7 @@ void wxRendererMac::DrawMacHeaderCell(wxWindow *win,
 
         cell.title = title;
         cell.alignment = alignment;
+        cell.state = NSControlStateValueMixed;
 
         wxGCDCImpl *impl = (wxGCDCImpl*) dc.GetImpl();
         CGContextRef cgContext = (CGContextRef) impl->GetGraphicsContext()->GetNativeContext();
