@@ -59,8 +59,6 @@ protected:
 private:
     typedef wxCheckBoxBase base_type;
 
-    virtual void GTKRemoveBorder() override;
-
     GtkWidget *m_widgetCheckbox;
     GtkWidget *m_widgetLabel;
 
