@@ -730,6 +730,7 @@ private:
     unsigned int m_minDockStyle = wxAUI_MIN_DOCK_DEFAULT;
 
 #ifndef SWIG
+    wxDECLARE_EVENT_TABLE();
     wxDECLARE_CLASS(wxAuiManager);
 #endif // SWIG
 };
