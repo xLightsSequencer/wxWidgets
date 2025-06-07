@@ -662,6 +662,7 @@ private:
     bool m_updateOnRestore = false;
 
 #ifndef SWIG
+    wxDECLARE_EVENT_TABLE();
     wxDECLARE_CLASS(wxAuiManager);
 #endif // SWIG
 };
