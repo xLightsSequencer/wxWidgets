@@ -728,6 +728,18 @@ void wxPropertyGrid::OnComboItemPaint( const wxPGComboBox* pCb,
 {
     wxPGProperty* p = pCb->GetProperty();
 
+    // xLights local patch: m_selProp (returned by GetProperty) can be stale or
+    // null when the combo is hidden during property-grid teardown -- the editor
+    // gets moved to m_deletedEditorObjects and its property may already be
+    // deleted, yet HidePopup() re-fires an OnMeasureItem/OnComboItemPaint via the
+    // popup's focus-loss. Painting then dereferences a freed property and crashes
+    // (top macOS crash bucket d8042ac846/9ef6ce33ac). Bail out safely.
+    if ( !p )
+    {
+        rect.height = 0;
+        return;
+    }
+
     wxString text;
 
     const wxPGChoices& choices = p->GetChoices();
