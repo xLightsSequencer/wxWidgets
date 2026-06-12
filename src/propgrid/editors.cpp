@@ -728,6 +728,28 @@ void wxPropertyGrid::OnComboItemPaint( const wxPGComboBox* pCb,
 {
     wxPGProperty* p = pCb->GetProperty();
 
+    // xLights local patch: m_selProp (returned by GetProperty) is set once at
+    // editor creation and never cleared, so a combo retired into
+    // m_deletedEditorObjects can hold a DANGLING (non-null) property pointer
+    // after the grid is rebuilt. HidePopup()'s focus-loss re-fires
+    // OnMeasureItem/OnComboItemPaint on that retired combo; painting then
+    // dereferences the freed property and crashes (top macOS crash bucket
+    // d8042ac846/9ef6ce33ac). The !p check only catches a null property, not
+    // the dangling case, so first bail if this combo is pending deletion.
+    for ( wxObject* o : m_deletedEditorObjects )
+    {
+        if ( o == pCb )
+        {
+            rect.height = 0;
+            return;
+        }
+    }
+    if ( !p )
+    {
+        rect.height = 0;
+        return;
+    }
+
     wxString text;
 
     const wxPGChoices& choices = p->GetChoices();
