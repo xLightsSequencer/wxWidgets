@@ -1569,7 +1569,11 @@ outlineView:(NSOutlineView*)outlineView
     if (!initialized)
     {
         initialized = YES;
-        wxOSXCocoaClassAddWXMethods(self, wxOSXSKIP_DND);
+        // Overriding the left button methods makes NSTableView drop gesture
+        // recognizer support, and the outline view doesn't need them: it
+        // tracks clicks itself and reports selections, activation and context
+        // menus through its delegate and double action.
+        wxOSXCocoaClassAddWXMethods(self, (wxOSXSkipOverrides)(wxOSXSKIP_DND | wxOSXSKIP_LEFTMOUSE));
     }
 }
 
