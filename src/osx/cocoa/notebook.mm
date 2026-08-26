@@ -91,10 +91,13 @@
         // On macOS 26 Tahoe, the mere presence of drawRect: in derived class,
         // even if it just calls super's implementation, triggers legacy
         // rendering of NSTabView.
+        // Overriding the left button methods makes NSTabView drop gesture
+        // recognizer support, so leave those to it as well - it selects tabs
+        // itself and the right/other buttons still reach wx.
 #if __MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_VERSION_26_0
         if (WX_IS_MACOS_AVAILABLE(26, 0))
         {
-            wxOSXCocoaClassAddWXMethods(self, wxOSXSKIP_DRAW);
+            wxOSXCocoaClassAddWXMethods(self, (wxOSXSkipOverrides)(wxOSXSKIP_DRAW | wxOSXSKIP_LEFTMOUSE));
         }
         else
 #endif

@@ -529,7 +529,10 @@ public:
     enum wxOSXSkipOverrides {
         wxOSXSKIP_NONE = 0x0,
         wxOSXSKIP_DRAW = 0x1,
-        wxOSXSKIP_DND = 0x2
+        wxOSXSKIP_DND = 0x2,
+        // AppKit turns off its own gesture recognizer support for some control
+        // classes as soon as a subclass overrides the left button methods.
+        wxOSXSKIP_LEFTMOUSE = 0x4
     };
 
     void WXDLLIMPEXP_CORE wxOSXCocoaClassAddWXMethods(Class c, wxOSXSkipOverrides skipFlags = wxOSXSKIP_NONE);
