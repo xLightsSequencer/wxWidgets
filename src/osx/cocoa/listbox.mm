@@ -291,7 +291,10 @@ protected:
     if (!initialized)
     {
         initialized = YES;
-        wxOSXCocoaClassAddWXMethods( self );
+        // As for the outline view in dataview.mm, keep NSTableView's gesture
+        // recognizer support by leaving the left button to it: selections and
+        // double clicks come in through the delegate and the double action.
+        wxOSXCocoaClassAddWXMethods( self, wxOSXSKIP_LEFTMOUSE );
     }
 }
 
