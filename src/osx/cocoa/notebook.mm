@@ -205,6 +205,32 @@ class wxCocoaTabView : public wxWidgetCocoaImpl
 public:
     wxCocoaTabView( wxWindowMac* peer , WXWidget w ) : wxWidgetCocoaImpl(peer, w)
     {
+        // NSTabView hands its content rect on to the page views and to the
+        // segmented control holding the tabs, so a tab view smaller than its
+        // own chrome gives them a negative sized frame. The chrome doesn't
+        // change afterwards, so measure it once here, while the tab view is
+        // still empty, and never let the frame fall below it. The segmented
+        // control is inset inside the content area, hence the extra margin.
+        const CGFloat marginForTabs = 4;
+        NSTabView* tabview = (NSTabView*) w;
+        const NSRect former = [tabview frame];
+        const CGFloat probe = 1000;
+        [tabview setFrame:NSMakeRect(former.origin.x, former.origin.y, probe, probe)];
+        const NSRect content = [tabview contentRect];
+        m_chrome = NSMakeSize(probe - content.size.width + marginForTabs,
+                              probe - content.size.height + marginForTabs);
+
+        NSRect frame = former;
+        frame.size.width = wxMax(frame.size.width, m_chrome.width);
+        frame.size.height = wxMax(frame.size.height, m_chrome.height);
+        [tabview setFrame:frame];
+    }
+
+    void Move( int x, int y, int width, int height ) override
+    {
+        wxWidgetCocoaImpl::Move(x, y,
+                                wxMax(width, (int)m_chrome.width),
+                                wxMax(height, (int)m_chrome.height));
     }
 
     void GetContentArea( int &left , int &top , int &width , int &height ) const override
@@ -213,8 +239,8 @@ public:
         NSRect r = [slf contentRect];
         left = (int)r.origin.x;
         top = (int)r.origin.y;
-        width = (int)r.size.width;
-        height = (int)r.size.height;
+        width = wxMax((int)r.size.width, 0);
+        height = wxMax((int)r.size.height, 0);
     }
 
     void SetValue( wxInt32 value ) override
@@ -301,6 +327,8 @@ public:
     }
 
 private:
+    NSSize m_chrome;
+
     void SetupTabItem(const wxNotebook& notebook, int i, NSTabViewItem* item)
     {
         wxNotebookPage* page = notebook.GetPage(i);
