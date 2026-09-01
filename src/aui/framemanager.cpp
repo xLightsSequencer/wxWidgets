@@ -29,6 +29,7 @@
 #include "wx/aui/serializer.h"
 #include "wx/mdi.h"
 #include "wx/wupdlock.h"
+#include "wx/scopeguard.h"
 
 #ifndef WX_PRECOMP
     #include "wx/panel.h"
@@ -3144,6 +3145,19 @@ void wxAuiManager::Update()
         return;
     }
 
+    if ( m_inUpdate )
+    {
+        // Re-entered from a size event or a handler run by one of the window
+        // operations below. Rebuilding m_uiParts underneath the outer call
+        // would leave it holding freed sizer items, so just ask the outer call
+        // to run again once it has finished.
+        m_updateAgain = true;
+        return;
+    }
+
+    m_inUpdate = true;
+    wxON_BLOCK_EXIT_SET(m_inUpdate, false);
+
     m_hoverButton = nullptr;
     m_actionPart = nullptr;
 
@@ -3344,6 +3358,20 @@ void wxAuiManager::Update()
 
 
     Repaint();
+
+    // A nested Update() was turned away above; run it now that the layout is
+    // consistent again. Bounded so a handler that unconditionally calls
+    // Update() on every resize cannot recurse forever.
+    if ( m_updateAgain && m_updateRedos < 4 )
+    {
+        m_updateAgain = false;
+        m_inUpdate = false;
+        ++m_updateRedos;
+        Update();
+        --m_updateRedos;
+        return;
+    }
+    m_updateAgain = false;
 
     // set frame's minimum size
 
@@ -4617,7 +4645,14 @@ void wxAuiManager::OnSize(wxSizeEvent& event)
 {
     if (m_frame)
     {
-        if ( m_updateOnRestore )
+        if ( m_inUpdate )
+        {
+            // Update() is mid-way through rebuilding m_uiParts and has already
+            // deleted the frame's old sizer, so laying out now would dereference
+            // freed sizer items. Update() lays out and repaints on the way out
+            // anyway, so there is nothing to do here.
+        }
+        else if ( m_updateOnRestore )
         {
             // If we had postponed updating, do it now: we only receive size
             // events once the window is restored.

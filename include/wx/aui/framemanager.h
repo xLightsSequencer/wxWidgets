@@ -735,6 +735,19 @@ private:
     // Number of (possibly nested) calls to DoFrameLayout() currently executing.
     int m_frameLayoutDepth = 0;
 
+    // Set while Update() is running. Update() empties and rebuilds m_uiParts
+    // and deletes the frame's old sizer, so the sizer_item pointers held by
+    // m_uiParts are dangling for part of it. The window operations Update()
+    // performs (showing/hiding/reparenting/resizing panes and floating frames)
+    // can deliver a size event synchronously, and the resulting DoFrameLayout()
+    // would walk m_uiParts in that state. Both re-entry points check this.
+    bool m_inUpdate = false;
+
+    // Set if a nested Update() call arrived while m_inUpdate was set, so the
+    // outer Update() can run it on the way out, and the depth of such redos.
+    bool m_updateAgain = false;
+    int m_updateRedos = 0;
+
     // Toolbars used to show minimized panes. Some, or all, of them can be null.
     //
     // This is indexed by wxAUI_DOCK_TOP, wxAUI_DOCK_BOTTOM, wxAUI_DOCK_RIGHT
