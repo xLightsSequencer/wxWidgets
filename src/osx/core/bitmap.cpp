@@ -390,8 +390,12 @@ void wxBitmapRefData::UseAlpha( bool use )
 
     CGContextRef hBitmap = CGBitmapContextCreate(nullptr, GetWidth(), GetHeight(), 8, GetBytesPerRow(), wxMacGetGenericRGBColorSpace(), use ? kCGImageAlphaPremultipliedFirst : kCGImageAlphaNoneSkipFirst );
 
-    memcpy(CGBitmapContextGetData(hBitmap),CGBitmapContextGetData(m_hBitmap),GetBytesPerRow()*GetHeight());
+    // xLights local patch: the check has to come before the memcpy - a large
+    // bitmap can fail to allocate here, and CGBitmapContextGetData(nullptr)
+    // then hands memcpy a null destination.
     wxCHECK_RET( hBitmap , "Unable to create CGBitmapContext context" ) ;
+
+    memcpy(CGBitmapContextGetData(hBitmap),CGBitmapContextGetData(m_hBitmap),GetBytesPerRow()*GetHeight());
     CGContextTranslateCTM( hBitmap, 0,  GetHeight() );
     CGContextScaleCTM( hBitmap, GetScaleFactor(), -GetScaleFactor() );
 
