@@ -271,7 +271,12 @@ void wxPropertyGridPageState::DoClear()
 
     // If handling wxPG event then every property item must be
     // deleted individually (and with deferral).
-    if ( m_pPropGrid && m_pPropGrid->m_processedEvent )
+    // xLights local patch: likewise while an editor event is being handled,
+    // e.g. a button's dialog that repopulates the grid: HandleCustomEditorEvent()
+    // keeps using the selected property after the dialog returns.
+    if ( m_pPropGrid &&
+         (m_pPropGrid->m_processedEvent ||
+          m_pPropGrid->HasInternalFlag(wxPropertyGrid::wxPG_FL_IN_HANDLECUSTOMEDITOREVENT)) )
     {
         for (unsigned int i = 0; i < m_regularArray.GetChildCount(); i++)
         {
@@ -1930,7 +1935,10 @@ void wxPropertyGridPageState::DoDelete( wxPGProperty* item, bool doDelete )
     }
 
     // Must defer deletion? Yes, if handling a wxPG event.
-    if ( pg && pg->m_processedEvent )
+    // xLights local patch: or a property editor event (see DoClear()).
+    if ( pg &&
+         (pg->m_processedEvent ||
+          pg->HasInternalFlag(wxPropertyGrid::wxPG_FL_IN_HANDLECUSTOMEDITOREVENT)) )
     {
         // Prevent adding duplicates to the lists.
         if ( doDelete )

@@ -5874,6 +5874,15 @@ void wxPropertyGrid::OnIdle( wxIdleEvent& WXUNUSED(event) )
     if ( m_processedEvent )
         return;
 
+    // xLights local patch: an editor button can run a modal dialog from inside
+    // HandleCustomEditorEvent(), whose idle events land here.  If the editors
+    // were freed meanwhile (e.g. the grid was repopulated), deleting them now
+    // destroys the button and the wxPropertyGridEditorEventForwarder that are
+    // still dispatching the click, and the forwarder then reads its freed
+    // m_propGrid.  Defer all pending deletions until that dispatch unwinds.
+    if ( HasInternalFlag(wxPG_FL_IN_HANDLECUSTOMEDITOREVENT) )
+        return;
+
     //
     // Check if the focus is in this control or one of its children
     wxWindow* newFocused = wxWindow::FindFocus();
